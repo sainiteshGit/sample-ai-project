@@ -1,0 +1,87 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/SaiNitesh/sample-ai-project/MCPSample/MCPSample.csproj": {}
+  },
+  "projects": {
+    "/Users/SaiNitesh/sample-ai-project/MCPSample/MCPSample.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/SaiNitesh/sample-ai-project/MCPSample/MCPSample.csproj",
+        "projectName": "MCPSample",
+        "projectPath": "/Users/SaiNitesh/sample-ai-project/MCPSample/MCPSample.csproj",
+        "packagesPath": "/Users/SaiNitesh/.nuget/packages/",
+        "outputPath": "/Users/SaiNitesh/sample-ai-project/MCPSample/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/SaiNitesh/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
+            "ModelContextProtocol": {
+              "target": "Package",
+              "version": "[0.1.0-preview.13, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.4.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.402/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
