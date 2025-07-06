@@ -1,2 +1,4 @@
 ./semantickernel-agent/SemanticKernelSampleApp/bin/*
 ./semantickernel-agent/SemanticKernelSampleApp/bin
+.DS_Store
+./*.dll
