@@ -18,6 +18,8 @@ dotnet add package Microsoft.Extensions.Configuration.UserSecrets
 dotnet add package Microsoft.Extensions.Configuration.EnvironmentVariables
 dotnet add package Microsoft.SemanticKernel.Connectors.AzureOpenAI
 dotnet add package Microsoft.SemanticKernel.Agents.Core --prerelease
+dotnet add package Microsoft.SemanticKernel.Agents.Orchestration --prerelease
+dotnet add package Microsoft.SemanticKernel.Agents.Runtime.InProcess --prerelease
 ```
 
 

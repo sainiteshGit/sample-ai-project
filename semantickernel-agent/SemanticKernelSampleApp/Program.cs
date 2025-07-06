@@ -6,7 +6,10 @@ using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.AzureOpenAI;
 using Plugins;
-
+using Microsoft.SemanticKernel.Agents.Orchestration;
+using Microsoft.SemanticKernel.Agents.Orchestration.Concurrent;
+using Microsoft.SemanticKernel.Agents.Orchestration.Sequential;
+using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 namespace SemanticKernelSampleApp;
 
 public static class Program
@@ -27,67 +30,115 @@ public static class Program
             endpoint: Settings.Endpoint,
             modelId: Settings.ChatModelDeployment);
 
-        builder.Plugins.AddFromObject(mathPlugin);
-        builder.Plugins.AddFromObject(taxPlugin);
-
         Kernel kernel = builder.Build();
 
         Console.WriteLine("Defining agent...");
-        ChatCompletionAgent agent =
-            new()
-            {
-                Name = "AssistantAgent",
-                Instructions =
-                        """
-                        You are an agent designed to help users with math and tax calculations.
 
-                        Use the MathPlugin for mathematical operations such as addition, subtraction, multiplication, division, and more.
-                        Use the TaxPlugin to help users calculate tax amounts and net income based on their income and tax rate.
+        //###################### Concurrent ORCHESTRATION ######################
 
-                        Use the current date and time to provide up-to-date details or time-sensitive responses.
-
-                        The current date and time is: {{$now}}. 
-                        """,
-                Kernel = kernel,
-                Arguments =
-                    new KernelArguments(new AzureOpenAIPromptExecutionSettings() { FunctionChoiceBehavior = FunctionChoiceBehavior.Auto() })
-            };
-
-        Console.WriteLine("Ready!");
-
-        ChatHistoryAgentThread agentThread = new();
-        bool isComplete = false;
-        do
+        ChatCompletionAgent securityAgent = new ChatCompletionAgent
         {
-            Console.WriteLine();
-            Console.Write("> ");
-            string input = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(input))
+            Name = "SecurityAuditor",
+            Description = "A security expert that reviews code for security flaws, hardcoded secrets, and OWASP Top 10 vulnerabilities.",
+            Instructions = @"You are a security expert. Review code for security flaws, hardcoded secrets, and OWASP Top 10 vulnerabilities.
+After your analysis, only provide:
+Summary: A one-sentence summary of your findings.
+Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
+            Kernel = kernel,
+        };
+
+        ChatCompletionAgent reliabilityAgent = new ChatCompletionAgent
+        {
+            Name = "ReliabilityAgent",
+            Description = "A software reliability engineer that audits code for reliability, fault tolerance, and error handling.",
+            Instructions = @"
+You are a software reliability engineer.
+
+Your task is to audit the given code for reliability issues. Focus on:
+- Fault tolerance and graceful failure handling
+- Use (or absence) of retry, timeout, and circuit breaker patterns
+- How transient errors are managed (e.g., HTTP failures, database timeouts)
+- Logging of failure scenarios
+- Whether the code can recover from partial failures
+- Avoidance of anti-patterns like silent exception swallowing
+
+Highlight any parts of the code that could lead to service instability under load or network failures.
+
+Be technical, precise, and suggest improvements.
+
+After your analysis, only provide:
+Summary: A one-sentence summary of your findings.
+Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
+            Kernel = kernel,
+        };
+
+        ChatCompletionAgent testingAgent = new ChatCompletionAgent
+        {
+            Name = "TestCoverageAgent",
+            Description = "A testing expert that ensures test coverage and suggests missing test cases.",
+            Instructions = @"You are a testing expert. Ensure test coverage is adequate and that edge cases are handled. Suggest missing test cases.
+After your analysis, only provide:
+Summary: A one-sentence summary of your findings.
+Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
+            Kernel = kernel,
+        };
+
+        ConcurrentOrchestration orchestration = new(securityAgent, testingAgent, reliabilityAgent);
+
+        InProcessRuntime runtime = new InProcessRuntime();
+        await runtime.StartAsync();
+        string code = @"public async Task<string> GetUserProfileAsync(string userId)
+        {
+            var apiKey = ""hardcoded-api-key"";
+
+            var client = new HttpClient();
+            var response = await client.GetAsync(""https://externalapi.com/user/"" + userId);
+
+            if (response.IsSuccessStatusCode)
             {
-                continue;
+                var userData = await response.Content.ReadAsStringAsync();
+                return userData;
             }
-            if (input.Trim().Equals("EXIT", StringComparison.OrdinalIgnoreCase))
+            else
             {
-                isComplete = true;
-                break;
+                return null;
             }
+        }";
 
-            var message = new ChatMessageContent(AuthorRole.User, input);
+        var concurrentResult = await orchestration.InvokeAsync(code, runtime);
 
-            Console.WriteLine();
+        string[] output = await concurrentResult.GetValueAsync(TimeSpan.FromSeconds(20));
+        Console.WriteLine($"\n\t\t############################## Concurrent Orchestration Result Start #########################\n{string.Join("\n\n", output.Select(text => $"{text}"))}");
+        Console.WriteLine("################# Concurrent Orchestration Result End #########################\n");
 
-            DateTime now = DateTime.Now;
-            KernelArguments arguments =
-                new()
-                {
-                    { "now", $"{now.ToShortDateString()} {now.ToShortTimeString()}" }
-                };
-            await foreach (ChatMessageContent response in agent.InvokeAsync(message, agentThread, options: new() { KernelArguments = arguments }))
-            {
-                // Display response.
-                Console.WriteLine($"{response.Content}");
-            }
+        //Sequential Orchestration
 
-        } while (!isComplete);
+        ChatHistory history = [];
+
+        ValueTask responseCallback(ChatMessageContent response)
+        {
+            history.Add(response);
+            return ValueTask.CompletedTask;
+        }
+
+        SequentialOrchestration sequentialOrchestration = new(securityAgent, testingAgent, reliabilityAgent)
+        {
+            ResponseCallback = responseCallback,
+        };
+        var sequentialResult = await sequentialOrchestration.InvokeAsync(code, runtime);
+
+        string sequentialOrcehstrationoutput = await sequentialResult.GetValueAsync(TimeSpan.FromSeconds(20));
+        Console.WriteLine($"\n\t\t############################## Sequential Orchestration Result Start #########################\n{string.Join("\n\n", sequentialOrcehstrationoutput)}");
+        Console.WriteLine("################# Sequential Orchestration Result End #########################\n");
+
+
+        await runtime.RunUntilIdleAsync();
+
+
+
+        //Concurrent
+        //Sequential
+        //GroupChat
+        //Magentic One
     }
 }
