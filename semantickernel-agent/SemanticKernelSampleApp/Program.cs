@@ -9,6 +9,7 @@ using Plugins;
 using Microsoft.SemanticKernel.Agents.Orchestration;
 using Microsoft.SemanticKernel.Agents.Orchestration.Concurrent;
 using Microsoft.SemanticKernel.Agents.Orchestration.Sequential;
+using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 namespace SemanticKernelSampleApp;
 
@@ -41,9 +42,9 @@ public static class Program
             Name = "SecurityAuditor",
             Description = "A security expert that reviews code for security flaws, hardcoded secrets, and OWASP Top 10 vulnerabilities.",
             Instructions = @"You are a security expert. Review code for security flaws, hardcoded secrets, and OWASP Top 10 vulnerabilities.
-After your analysis, only provide:
-Summary: A one-sentence summary of your findings.
-Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
+            After your analysis, only provide:
+            Summary: A one-sentence summary of your findings.
+            Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
             Kernel = kernel,
         };
 
@@ -52,23 +53,23 @@ Description: A short paragraph (max 120 characters) describing the most importan
             Name = "ReliabilityAgent",
             Description = "A software reliability engineer that audits code for reliability, fault tolerance, and error handling.",
             Instructions = @"
-You are a software reliability engineer.
+            You are a software reliability engineer.
 
-Your task is to audit the given code for reliability issues. Focus on:
-- Fault tolerance and graceful failure handling
-- Use (or absence) of retry, timeout, and circuit breaker patterns
-- How transient errors are managed (e.g., HTTP failures, database timeouts)
-- Logging of failure scenarios
-- Whether the code can recover from partial failures
-- Avoidance of anti-patterns like silent exception swallowing
+            Your task is to audit the given code for reliability issues. Focus on:
+            - Fault tolerance and graceful failure handling
+            - Use (or absence) of retry, timeout, and circuit breaker patterns
+            - How transient errors are managed (e.g., HTTP failures, database timeouts)
+            - Logging of failure scenarios
+            - Whether the code can recover from partial failures
+            - Avoidance of anti-patterns like silent exception swallowing
 
-Highlight any parts of the code that could lead to service instability under load or network failures.
+            Highlight any parts of the code that could lead to service instability under load or network failures.
 
-Be technical, precise, and suggest improvements.
+            Be technical, precise, and suggest improvements.
 
-After your analysis, only provide:
-Summary: A one-sentence summary of your findings.
-Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
+            After your analysis, only provide:
+            Summary: A one-sentence summary of your findings.
+            Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
             Kernel = kernel,
         };
 
@@ -77,9 +78,9 @@ Description: A short paragraph (max 120 characters) describing the most importan
             Name = "TestCoverageAgent",
             Description = "A testing expert that ensures test coverage and suggests missing test cases.",
             Instructions = @"You are a testing expert. Ensure test coverage is adequate and that edge cases are handled. Suggest missing test cases.
-After your analysis, only provide:
-Summary: A one-sentence summary of your findings.
-Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
+            After your analysis, only provide:
+            Summary: A one-sentence summary of your findings.
+            Description: A short paragraph (max 120 characters) describing the most important issue or insight.",
             Kernel = kernel,
         };
 
@@ -131,6 +132,60 @@ Description: A short paragraph (max 120 characters) describing the most importan
         Console.WriteLine($"\n\t\t############################## Sequential Orchestration Result Start #########################\n{string.Join("\n\n", sequentialOrcehstrationoutput)}");
         Console.WriteLine("################# Sequential Orchestration Result End #########################\n");
 
+        //Group Chat Orchestration
+
+        ChatCompletionAgent productOwner = new ChatCompletionAgent{
+            Name= "ProductOwner",
+            Description= "A product owner who clarifies requirements.",
+            Instructions= "You are a Product Owner. Expand on the business requirements and clarify any ambiguities. Ask questions if something is unclear, but focus on gathering all necessary details.",
+            Kernel= kernel // The LLM connection
+        };
+
+        ChatCompletionAgent developer = new ChatCompletionAgent
+        {
+            Name = "Developer",
+            Description = "A developer who breaks down requirements.",
+            Instructions = "You are a Developer. Break down the requirements into user stories and technical tasks. Be concise and clear.",
+            Kernel = kernel
+        };
+
+        ChatCompletionAgent qaAgent = new ChatCompletionAgent
+        {
+            Name = "QATester",
+            Description = "A QA engineer who writes test cases.",
+            Instructions = "You are a QA Engineer. Write Gherkin Given/When/Then tests for each user story. When done, finish with 'Test cases complete'. Do not keep asking how to help further.",
+            Kernel = kernel
+        };
+
+        ChatHistory grouphistory = [];
+
+        ValueTask responseCallbackGroup(ChatMessageContent response)
+        {
+            grouphistory.Add(response);
+            return ValueTask.CompletedTask;
+        }
+
+        GroupChatOrchestration groupChatOrchestration = new GroupChatOrchestration(
+            new RoundRobinGroupChatManager { MaximumInvocationCount = 15 },
+            productOwner,
+            developer, qaAgent)
+        {
+            ResponseCallback = responseCallbackGroup,
+        };
+
+        string initialTask = "We need an online grocery ordering system with same-day delivery, secure payments, order tracking, and promo codes.";
+
+        var groupResult = await groupChatOrchestration.InvokeAsync(initialTask,runtime);
+        Console.WriteLine($"\n\t\t############################## Group Chat Orchestration Result Start #########################");
+        string groupOutput = await groupResult.GetValueAsync(TimeSpan.FromSeconds(120));
+        Console.WriteLine($"\n# GROUP CHAT ORCHESTRATION RESULT: {groupOutput}");
+        Console.WriteLine("\n\nGROUP CHAT ORCHESTRATION  HISTORY");
+        foreach (ChatMessageContent message in grouphistory)
+        {
+            Console.WriteLine($"{message.Role}: {message.Content}");
+        }
+
+        Console.WriteLine("################# Group Chat Orchestration Result End #########################\n");
 
         await runtime.RunUntilIdleAsync();
 
