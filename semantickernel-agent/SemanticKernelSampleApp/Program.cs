@@ -11,6 +11,7 @@ using Microsoft.SemanticKernel.Agents.Orchestration.Concurrent;
 using Microsoft.SemanticKernel.Agents.Orchestration.Sequential;
 using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
+using Microsoft.SemanticKernel.Agents.Orchestration.Handoff;
 namespace SemanticKernelSampleApp;
 
 public static class Program
@@ -134,11 +135,12 @@ public static class Program
 
         //Group Chat Orchestration
 
-        ChatCompletionAgent productOwner = new ChatCompletionAgent{
-            Name= "ProductOwner",
-            Description= "A product owner who clarifies requirements.",
-            Instructions= "You are a Product Owner. Expand on the business requirements and clarify any ambiguities. Ask questions if something is unclear, but focus on gathering all necessary details.",
-            Kernel= kernel // The LLM connection
+        ChatCompletionAgent productOwner = new ChatCompletionAgent
+        {
+            Name = "ProductOwner",
+            Description = "A product owner who clarifies requirements.",
+            Instructions = "You are a Product Owner. Expand on the business requirements and clarify any ambiguities. Ask questions if something is unclear, but focus on gathering all necessary details.",
+            Kernel = kernel // The LLM connection
         };
 
         ChatCompletionAgent developer = new ChatCompletionAgent
@@ -175,7 +177,7 @@ public static class Program
 
         string initialTask = "We need an online grocery ordering system with same-day delivery, secure payments, order tracking, and promo codes.";
 
-        var groupResult = await groupChatOrchestration.InvokeAsync(initialTask,runtime);
+        var groupResult = await groupChatOrchestration.InvokeAsync(initialTask, runtime);
         Console.WriteLine($"\n\t\t############################## Group Chat Orchestration Result Start #########################");
         string groupOutput = await groupResult.GetValueAsync(TimeSpan.FromSeconds(120));
         Console.WriteLine($"\n# GROUP CHAT ORCHESTRATION RESULT: {groupOutput}");
@@ -187,10 +189,89 @@ public static class Program
 
         Console.WriteLine("################# Group Chat Orchestration Result End #########################\n");
 
+        //HandOff Orchestration
+
+        ChatCompletionAgent dbAgent = new ChatCompletionAgent
+        {
+            Name = "DBMitigationAgent",
+            Description = "Handles database-related incidents.",
+            Instructions = "You specialize in database reliability issues. If the incident is about DB timeouts, propose retries or scaling.",
+            Kernel = kernel // The LLM connection
+        };
+
+        ChatCompletionAgent netAgent = new ChatCompletionAgent
+        {
+            Name = "NetworkMitigationAgent",
+            Description = "Handles network connectivity problems.",
+            Instructions = "You handle network issues like packet loss or high latency. Suggest network failover or CDN fixes.",
+            Kernel = kernel // The LLM connection
+        };
+
+        ChatCompletionAgent triageAgent = new ChatCompletionAgent
+        {
+            Name = "TriageAgent",
+            Description = "Determines which agent should handle the issue.",
+            Instructions = """
+                You are a triage AI. Read the incident description and decide:
+                - If it's a database-related issue, hand off to DBMitigationAgent
+                - If it's a network-related issue, hand off to NetworkMitigationAgent
+                - If it's unknown, escalate to HumanEscalationAgent
+                Always explain your decision.
+                """,
+            Kernel = kernel // The LLM connection
+        };
+
+        var handoffs = OrchestrationHandoffs
+            .StartWith(triageAgent)
+            .Add(triageAgent, netAgent, dbAgent)
+            .Add(netAgent, triageAgent, "Transfer to this agent if the issue is not related to network connectivity")
+            .Add(dbAgent, triageAgent, "Transfer to this agent if the issue is not return related to db connectivity");
+
+        ChatHistory handOffHistory = [];
+
+        ValueTask responseHandOffCallback(ChatMessageContent response)
+        {
+            handOffHistory.Add(response);
+            return ValueTask.CompletedTask;
+        }
+
+        // Simulate user input with a queue
+        Queue<string> responses = new();
+        responses.Enqueue("I'd like to resolve Deployment v2.3.1 failed due to DB connection timeout errors after schema migration.");
+        responses.Enqueue("No, I have another issue.");
+        responses.Enqueue("I'd like to resolve Deployment v2.3.2 failed due to Network connection unreachable host.");
+
+        ValueTask<ChatMessageContent> interactiveCallback()
+        {
+            string input = responses.Dequeue();
+            Console.WriteLine($"\n# INPUT: {input}\n");
+            return ValueTask.FromResult(new ChatMessageContent(AuthorRole.User, input));
+        }
+
+        //setup handoff orchestration
+        HandoffOrchestration handoffOrchestration = new HandoffOrchestration(
+            handoffs,
+            triageAgent,
+            netAgent,
+            dbAgent)
+        {
+            InteractiveCallback = interactiveCallback,
+            ResponseCallback = responseHandOffCallback,
+        };
+
+        string task = "I'd like to resolve Deployment v2.3.1 failed due to DB connection timeout errors after schema migration.";
+        var handOffResult = await handoffOrchestration.InvokeAsync(task, runtime);
+
+        Console.WriteLine($"\n\n\t\t############################## HandOff Orchestration Result Start #########################");
+        string handOffOutput = await handOffResult.GetValueAsync(TimeSpan.FromSeconds(120));
+        Console.WriteLine($"\n# HandOff ORCHESTRATION RESULT: {handOffOutput}");
+        Console.WriteLine("\n HandOff ORCHESTRATION  HISTORY");
+        foreach (ChatMessageContent message in handOffHistory)
+        {
+            Console.WriteLine($"{message.Role}: {message.Content}");
+        }
+        Console.WriteLine("################# HandOff Orchestration Result End #########################\n");
         await runtime.RunUntilIdleAsync();
-
-
-
         //Concurrent
         //Sequential
         //GroupChat
