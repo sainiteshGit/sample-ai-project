@@ -309,14 +309,15 @@ public static class Program
         ChatCompletionAgent triAgent = new ChatCompletionAgent
         {
             Name = "MagenticOneTriageAgent",
-            Description = "Determines which agent should handle the issue.",
+            Description = "Analyzes incident reports and determines recovery strategy.",
             Instructions = """
-                You are a triage AI. Read the incident description and decide:
-                - If it's a database-related issue, hand off to DBMitigationAgent
-                - If it's a network-related issue, hand off to NetworkMitigationAgent
-                - If it's unknown, escalate to HumanEscalationAgent
-                Always explain your decision.
-                """,
+            You are the first responder AI. Upon reading the disruption report:
+            - If supplier failure is detected, hand off to SupplierIntelAgent.
+            - If logistics delays are evident, activate LogisticsPlanningAgent.
+            - If replacement sourcing is needed, invoke FallbackSourcingAgent.
+            - If unsure, escalate to HumanEscalationAgent.
+            Always justify your routing decision.
+            """,
             Kernel = kernel // The LLM connection
         };
 
