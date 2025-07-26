@@ -12,6 +12,7 @@ using Microsoft.SemanticKernel.Agents.Orchestration.Sequential;
 using Microsoft.SemanticKernel.Agents.Orchestration.GroupChat;
 using Microsoft.SemanticKernel.Agents.Runtime.InProcess;
 using Microsoft.SemanticKernel.Agents.Orchestration.Handoff;
+using Microsoft.SemanticKernel.Agents.Magentic;
 namespace SemanticKernelSampleApp;
 
 public static class Program
@@ -109,7 +110,7 @@ public static class Program
 
         var concurrentResult = await orchestration.InvokeAsync(code, runtime);
 
-        string[] output = await concurrentResult.GetValueAsync(TimeSpan.FromSeconds(20));
+        string[] output = await concurrentResult.GetValueAsync(TimeSpan.FromSeconds(300));
         Console.WriteLine($"\n\t\t############################## Concurrent Orchestration Result Start #########################\n{string.Join("\n\n", output.Select(text => $"{text}"))}");
         Console.WriteLine("################# Concurrent Orchestration Result End #########################\n");
 
@@ -129,7 +130,7 @@ public static class Program
         };
         var sequentialResult = await sequentialOrchestration.InvokeAsync(code, runtime);
 
-        string sequentialOrcehstrationoutput = await sequentialResult.GetValueAsync(TimeSpan.FromSeconds(20));
+        string sequentialOrcehstrationoutput = await sequentialResult.GetValueAsync(TimeSpan.FromSeconds(300));
         Console.WriteLine($"\n\t\t############################## Sequential Orchestration Result Start #########################\n{string.Join("\n\n", sequentialOrcehstrationoutput)}");
         Console.WriteLine("################# Sequential Orchestration Result End #########################\n");
 
@@ -179,7 +180,7 @@ public static class Program
 
         var groupResult = await groupChatOrchestration.InvokeAsync(initialTask, runtime);
         Console.WriteLine($"\n\t\t############################## Group Chat Orchestration Result Start #########################");
-        string groupOutput = await groupResult.GetValueAsync(TimeSpan.FromSeconds(120));
+        string groupOutput = await groupResult.GetValueAsync(TimeSpan.FromSeconds(300));
         Console.WriteLine($"\n# GROUP CHAT ORCHESTRATION RESULT: {groupOutput}");
         Console.WriteLine("\n\nGROUP CHAT ORCHESTRATION  HISTORY");
         foreach (ChatMessageContent message in grouphistory)
@@ -263,7 +264,7 @@ public static class Program
         var handOffResult = await handoffOrchestration.InvokeAsync(task, runtime);
 
         Console.WriteLine($"\n\n\t\t############################## HandOff Orchestration Result Start #########################");
-        string handOffOutput = await handOffResult.GetValueAsync(TimeSpan.FromSeconds(120));
+        string handOffOutput = await handOffResult.GetValueAsync(TimeSpan.FromSeconds(300));
         Console.WriteLine($"\n# HandOff ORCHESTRATION RESULT: {handOffOutput}");
         Console.WriteLine("\n HandOff ORCHESTRATION  HISTORY");
         foreach (ChatMessageContent message in handOffHistory)
@@ -271,6 +272,88 @@ public static class Program
             Console.WriteLine($"{message.Role}: {message.Content}");
         }
         Console.WriteLine("################# HandOff Orchestration Result End #########################\n");
+
+
+        //Magentic Orchestration
+
+
+        StandardMagenticManager disruptionManager = new StandardMagenticManager(kernel.GetRequiredService<IChatCompletionService>(), new AzureOpenAIPromptExecutionSettings())
+        {
+            MaximumInvocationCount = 3
+        };
+
+        ChatCompletionAgent supplierIntelAgent = new ChatCompletionAgent
+        {
+            Name = "SupplierIntelAgent",
+            Description = "Monitors supplier status and external risks.",
+            Instructions = "Evaluate supplier disruptions using weather, logistics, and geopolitical data.",
+            Kernel = kernel
+        };
+
+        ChatCompletionAgent altSourcingAgent = new ChatCompletionAgent
+        {
+            Name = "AltSourcingAgent",
+            Description = "Finds alternative suppliers and evaluates feasibility.",
+            Instructions = "Search for fallback suppliers and compare cost, lead time, and compliance.",
+            Kernel = kernel
+        };
+
+        ChatCompletionAgent opsPlannerAgent = new ChatCompletionAgent
+        {
+            Name = "OpsPlannerAgent",
+            Description = "Proposes revised production and logistics plans.",
+            Instructions = "Simulate updated production plans based on fallback sourcing options.",
+            Kernel = kernel
+        };
+
+        ChatCompletionAgent triAgent = new ChatCompletionAgent
+        {
+            Name = "MagenticOneTriageAgent",
+            Description = "Determines which agent should handle the issue.",
+            Instructions = """
+                You are a triage AI. Read the incident description and decide:
+                - If it's a database-related issue, hand off to DBMitigationAgent
+                - If it's a network-related issue, hand off to NetworkMitigationAgent
+                - If it's unknown, escalate to HumanEscalationAgent
+                Always explain your decision.
+                """,
+            Kernel = kernel // The LLM connection
+        };
+
+        ChatHistory magenticOneHistory = [];
+
+        ValueTask responseCallbackMagentic(ChatMessageContent response)
+        {
+            magenticOneHistory.Add(response);
+            return ValueTask.CompletedTask;
+        }
+
+        var magenticOrchestration = new MagenticOrchestration(
+            disruptionManager,
+            supplierIntelAgent,
+            altSourcingAgent,
+            opsPlannerAgent,
+            triAgent)
+        {
+            ResponseCallback = responseCallbackMagentic
+        };
+
+        string magenticOneInput = @"
+        A key supplier in Taiwan has halted shipments due to a typhoon.
+        Assess the disruption, locate fallback suppliers, and revise production logistics accordingly.";
+
+        var magenticResult = await magenticOrchestration.InvokeAsync(magenticOneInput, runtime);
+        string magenticOutput = await magenticResult.GetValueAsync(TimeSpan.FromSeconds(300));
+
+        Console.WriteLine("\n\n\t\t############################## Magentic Orchestration Result Start #########################");
+        Console.WriteLine("\n🧾 FINAL PLAN:\n" + magenticOutput);
+        Console.WriteLine("\n📜 ORCHESTRATION HISTORY");
+        foreach (var message in magenticOneHistory)
+        {
+            Console.WriteLine($"[{message.Role}] {message.AuthorName}: {message.Content}");
+        }
+        Console.WriteLine("################# Magentic Orchestration Result End #########################\n");
+
         await runtime.RunUntilIdleAsync();
         //Concurrent
         //Sequential
