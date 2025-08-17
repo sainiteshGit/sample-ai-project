@@ -12,6 +12,11 @@ This repository demonstrates advanced orchestration and plugin integration using
   - Demonstrates agent orchestration patterns (Concurrent, Sequential, Group Chat, Handoff, Magentic)
   - Integrates custom plugins (e.g., TaxPlugin, MathPlugin)
   - Example scenarios for multi-agent collaboration
+- **SemanticKernelMcpSample/**
+  - Model Context Protocol (MCP) server with natural language database queries
+  - Provides intelligent access to Azure Cosmos DB using AI-powered SQL generation
+  - Integrates Semantic Kernel with MCP for database interactions
+  - See `SemanticKernelMcpSample/README.md` for details
 - **Plugins/**
   - Custom plugins for extending agent capabilities
   - Example: `TaxPlugin.cs` for tax calculations
@@ -22,6 +27,9 @@ This repository demonstrates advanced orchestration and plugin integration using
 - Custom plugin integration with KernelFunction attributes
 - Performance measurement for LLM responses
 - Sample scenarios for supply chain, code review, and sentiment analysis
+- **Model Context Protocol (MCP) integration** for standardized tool communication
+- **Natural language database queries** with AI-powered SQL generation
+- **Cosmos DB integration** through intelligent MCP server
 
 ## Getting Started
 
