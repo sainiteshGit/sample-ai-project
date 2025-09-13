@@ -1,0 +1,2 @@
+crewai
+openai  # needed for Azure OpenAI SDK
