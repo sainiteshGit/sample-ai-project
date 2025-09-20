@@ -1,0 +1,3 @@
+openai-agents
+openai
+python-dotenv
