@@ -18,6 +18,14 @@ Demonstrates sophisticated multi-agent workflow orchestration:
 - **Event Monitoring**: Real-time workflow progress and completion tracking
 - **Data Evolution**: How data structures evolve through multiple processing stages
 
+### 3. Travel Assistant with Shared State (`travel_assistant_shared_state.py`)
+Demonstrates advanced workflow patterns using shared state:
+- **Shared State Management**: Multiple executors collaborate through a common memory space
+- **Multi-Step Information Collection**: Destination, dates, and preferences collected separately
+- **Scalable Architecture**: New executors added without modifying existing ones (hotel recommender)
+- **Clean Data Flow**: Lightweight messages with centralized state management
+- **Real-World Application**: Complete travel planning with flights, hotels, and itineraries
+
 ## Workflow Overview
 
 The morning routine workflow consists of 5 stages:
@@ -89,6 +97,11 @@ python main.py
 python morning_routine_workflow.py
 ```
 
+**Run Travel Assistant with Shared State Demo:**
+```bash
+python travel_assistant_shared_state.py
+```
+
 ## Expected Output
 
 ### Chat History Management Demo (`main.py`)
@@ -105,6 +118,15 @@ The workflow demo will show:
 3. **Personalized morning routine** with weather, schedule, and activity recommendations
 4. **Complete routine package** with 30+ detailed steps and optimized timeline
 
+### Travel Assistant with Shared State Demo (`travel_assistant_shared_state.py`)
+The shared state demo will show:
+1. **Destination collection** from user input (e.g., Paris)
+2. **Date collection** with shared state reading (Dec 20-30, 2025)
+3. **Preference collection** accessing all previous data from shared state
+4. **Flight recommendations** generated from complete shared state
+5. **Hotel recommendations** added without modifying existing executors
+6. **Complete travel itinerary** with day-by-day plans
+
 ## Key Features Demonstrated
 
 ### Chat History Management
@@ -118,6 +140,14 @@ The workflow demo will show:
 - **Error Resilience**: Graceful handling of AI call failures with status tracking
 - **Real-time Monitoring**: Streaming workflow events for observability
 - **Data Transformation**: PersonProfile evolves into comprehensive MorningPlan through 5 stages
+
+### Travel Assistant with Shared State
+- **Shared State Pattern**: Key-value based state management accessible across all executors
+- **Modular Architecture**: New executors added without modifying existing pipeline
+- **Multi-Stage Collection**: Information gathered at different times and stored centrally
+- **Scalability**: Easy to add new recommendation engines (flights → hotels → activities)
+- **Clean Message Flow**: Messages stay lightweight while shared state contains full context
+- **Real-World Application**: Complete travel planning workflow from destination to itinerary
 
 ## Sample Output Examples
 
@@ -168,6 +198,61 @@ Morning Routine Steps:
    2. 6:35 AM - Morning stretch/yoga (15 min)
    3. 6:50 AM - Shower and personal care (20 min)
    ... and 33 more steps
+```
+
+### Travel Assistant with Shared State Demo
+```
+Microsoft Agent Framework - Travel Assistant with Shared State
+
+TRAVEL ASSISTANT WITH SHARED STATE
+This example shows how shared state enables:
+  - Multiple executors to access the same data
+  - Information collection at different times
+  - Clean, lightweight message passing
+  - Easy addition of new executors (hotel recommender)
+
+Setting up Travel Assistant Workflow with Shared State...
+Travel Assistant Workflow created successfully
+
+Step 1 - User Input: I want to go to Paris for a romantic getaway
+Destination collected: Paris
+Collecting travel dates based on previous stage...
+Reading from shared state - Destination: Paris
+Travel dates collected: {'start': '2025-12-20', 'end': '2025-12-30'}
+Collecting travel preferences based on previous stage...
+Reading from shared state:
+  - Destination: Paris
+  - Travel Dates: {'start': '2025-12-20', 'end': '2025-12-30'}
+Travel preferences collected: {'budget level': 'Budget-friendly', 'travel style': 'Adventure travel', 'accommodation type': 'Unique experiences'}
+Shared state now complete with all user information
+
+Recommending flights based on shared state data...
+Flight recommendations added to shared state
+Recommending hotels based on shared state data...
+Hotel recommendations added to shared state
+Building complete travel itinerary...
+Travel itinerary completed
+
+COMPLETE TRAVEL PLAN GENERATED
+Destination: Paris
+Travel Dates: {'start': '2025-12-20', 'end': '2025-12-30'}
+Preferences: {'budget level': 'Budget-friendly', 'travel style': 'Adventure travel', 'accommodation type': 'Unique experiences'}
+
+Flight Recommendations:
+  - Air France: Direct flights, $750-$900 round trip
+  - Norwegian Air: Budget option, $650-$800 round trip
+  - Lufthansa: with connections, $700-$850 round trip
+
+Hotel Recommendations:
+  - Generator Paris: Modern hostel, $40-60/night, 10th Arrondissement
+  - Le Village Montmartre: Boutique hotel, $80-120/night, Montmartre
+  - Generator Paris La Bellevilloise: Budget hostel, $35-50/night, Belleville
+
+Full Itinerary:
+  Day 1 (Dec 20): Arrival at CDG Airport, hotel check-in, evening stroll
+  Day 2 (Dec 21): Louvre Museum, Seine River walk, dinner in Latin Quarter
+  Day 3 (Dec 22): Eiffel Tower, Trocadéro viewpoint, street food tour
+  ... 7 more days of curated activities and attractions
 ```
 
 ## Troubleshooting
