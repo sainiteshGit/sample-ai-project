@@ -26,6 +26,14 @@ Demonstrates advanced workflow patterns using shared state:
 - **Clean Data Flow**: Lightweight messages with centralized state management
 - **Real-World Application**: Complete travel planning with flights, hotels, and itineraries
 
+### 4. Checkpoint-Based Document Processing (`simple_checkpoint.py`)
+Demonstrates fault-tolerant workflows with automatic checkpointing:
+- **Automatic Checkpoints**: State saved automatically after each workflow stage
+- **Failure Recovery**: Resume from last successful checkpoint without re-running completed work
+- **Cost Optimization**: Avoid redundant API calls by skipping completed stages
+- **3-Stage Pipeline**: Document Classifier → Summarizer → Risk Assessor
+- **Real-World Resilience**: Simulated network failures with automatic recovery
+
 ## Workflow Overview
 
 The morning routine workflow consists of 5 stages:
@@ -35,6 +43,12 @@ The morning routine workflow consists of 5 stages:
 3. **Routine Planner**: Creates detailed step-by-step morning routine activities
 4. **Timeline Optimizer**: Optimizes for efficiency and identifies parallel activities
 5. **Routine Finalizer**: Packages and validates the complete morning routine
+
+The checkpoint-based document processing workflow consists of 3 stages:
+
+1. **Document Classifier**: Classifies documents as CONTRACT, INVOICE, or REPORT
+2. **Summarizer**: Generates concise 2-sentence summaries (simulates failure on first run)
+3. **Risk Assessor**: Evaluates risk level from 0.0 (low) to 1.0 (high)
 
 ## Prerequisites
 
@@ -102,6 +116,11 @@ python morning_routine_workflow.py
 python travel_assistant_shared_state.py
 ```
 
+**Run Checkpoint-Based Document Processing Demo:**
+```bash
+python simple_checkpoint.py
+```
+
 ## Expected Output
 
 ### Chat History Management Demo (`main.py`)
@@ -127,6 +146,15 @@ The shared state demo will show:
 5. **Hotel recommendations** added without modifying existing executors
 6. **Complete travel itinerary** with day-by-day plans
 
+### Checkpoint-Based Document Processing Demo (`simple_checkpoint.py`)
+The checkpoint demo will show:
+1. **RUN 1**: Classifier completes successfully, Summarizer fails (simulated network error)
+2. **Checkpoint saved** automatically after Classifier stage
+3. **RUN 2**: Resume from checkpoint, Classifier stage is SKIPPED
+4. **Summarizer succeeds** on retry without re-running Classifier
+5. **Risk Assessor completes** the pipeline with final risk score
+6. **Cost savings** demonstrated by skipping already-completed work
+
 ## Key Features Demonstrated
 
 ### Chat History Management
@@ -148,6 +176,14 @@ The shared state demo will show:
 - **Scalability**: Easy to add new recommendation engines (flights → hotels → activities)
 - **Clean Message Flow**: Messages stay lightweight while shared state contains full context
 - **Real-World Application**: Complete travel planning workflow from destination to itinerary
+
+### Checkpoint-Based Document Processing
+- **Automatic State Persistence**: Checkpoints created after each superstep without manual intervention
+- **Resume Capability**: Workflow resumes from last successful checkpoint after failures
+- **Stage Skipping**: Completed stages are never re-executed, saving time and API costs
+- **File-Based Storage**: Checkpoints persisted to disk for cross-session recovery
+- **Workflow Validation**: Ensures workflow graph consistency when resuming
+- **Production-Ready Pattern**: Fault tolerance for long-running or expensive AI pipelines
 
 ## Sample Output Examples
 
@@ -255,6 +291,34 @@ Full Itinerary:
   ... 7 more days of curated activities and attractions
 ```
 
+### Checkpoint-Based Document Processing Demo
+```
+CHECKPOINT DEMO - Document Processing Workflow
+======================================================================
+
+RUN 1: Initial Execution
+----------------------------------------------------------------------
+[Classifier] Processing doc-001...
+  ✅ CONTRACT
+[Summarizer] Processing doc-001...
+
+💥 FAILED: Network timeout (simulated)
+💾 Checkpoints saved: 1
+
+RUN 2: Resume from Checkpoint
+----------------------------------------------------------------------
+[Summarizer] Processing doc-001...
+  ✅ Summary generated
+[Risk Assessor] Processing doc-001...
+  ✅ Risk: 0.30 (LOW)
+
+✅ SUCCESS!
+   Classification: CONTRACT
+   Risk: 0.30 (LOW)
+
+======================================================================
+```
+
 ## Troubleshooting
 
 **Import Error**: Make sure you're in the activated virtual environment
@@ -270,3 +334,5 @@ This demo suite is perfect for early career developers to learn:
 - **Error Handling**: Professional patterns for resilient AI applications
 - **Real-time Monitoring**: Observability patterns for production systems
 - **Resource Management**: Efficient use of Azure OpenAI resources across multiple agents
+- **Fault Tolerance**: Checkpoint-based recovery for long-running workflows
+- **Cost Optimization**: Avoiding redundant work through intelligent state management

@@ -1,2 +1,6 @@
-agent-framework 
+agent-framework[azure]
+python-dotenv
+azure-identity
+azure-ai-projects
+psutil 
 azure-identity

@@ -1,0 +1,35 @@
+{
+  "checkpoint_id": "b4b74a35-152b-48f1-9f6e-b1b95ffb8387",
+  "workflow_id": "c92d7032-d6af-47c1-86dd-ae5e81a41bec",
+  "timestamp": "2025-10-25T23:52:19.916535+00:00",
+  "messages": {
+    "classifier": [
+      {
+        "data": {
+          "__af_dataclass__": "__main__:Document",
+          "value": {
+            "id": "doc-001",
+            "content": "\n        Service Agreement between TechCorp Inc. and GlobalBiz LLC.\n        This agreement covers cloud infrastructure services including 24/7 monitoring,\n        99.9% uptime guarantee, automated backups, and SOC 2 compliance.\n        Contract term: 12 months. Payment: $50,000 annually.\n        Renewal terms: Auto-renewal unless terminated with 30 days notice.\n        ",
+            "classification": "CONTRACT",
+            "summary": null,
+            "risk_score": null
+          }
+        },
+        "source_id": "classifier",
+        "target_id": null,
+        "trace_contexts": null,
+        "source_span_ids": null
+      }
+    ]
+  },
+  "shared_state": {},
+  "executor_states": {},
+  "iteration_count": 0,
+  "max_iterations": 100,
+  "metadata": {
+    "superstep": 0,
+    "checkpoint_type": "initial",
+    "graph_signature": "f0a509604036b7b4083fa0bde4999bbbeca4732d215037bfc47405075fdc7d15"
+  },
+  "version": "1.0"
+}
