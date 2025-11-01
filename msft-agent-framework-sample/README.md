@@ -34,6 +34,14 @@ Demonstrates fault-tolerant workflows with automatic checkpointing:
 - **3-Stage Pipeline**: Document Classifier → Summarizer → Risk Assessor
 - **Real-World Resilience**: Simulated network failures with automatic recovery
 
+### 5. Workflow Visualization (`simple_workflow_viz.py`)
+Demonstrates visual workflow diagrams with WorkflowViz:
+- **Automatic Diagram Generation**: Mermaid flowcharts and PNG graphs from workflow definitions
+- **Fan-out/Fan-in Pattern**: Parallel processing with research, marketing, and legal agents
+- **Conditional Routing**: Smart decision-making with spam detection and routing
+- **No Azure Required**: Mock executors for instant demonstration without API calls
+- **Multiple Export Formats**: Mermaid (.md) for web and PNG for presentations
+
 ## Workflow Overview
 
 The morning routine workflow consists of 5 stages:
@@ -50,12 +58,27 @@ The checkpoint-based document processing workflow consists of 3 stages:
 2. **Summarizer**: Generates concise 2-sentence summaries (simulates failure on first run)
 3. **Risk Assessor**: Evaluates risk level from 0.0 (low) to 1.0 (high)
 
+The workflow visualization demo includes 2 patterns:
+
+**Fan-out/Fan-in Pattern (Parallel Processing):**
+1. **Dispatcher**: Sends task to multiple parallel agents
+2. **Researcher**: Analyzes technical feasibility
+3. **Marketer**: Evaluates market demand
+4. **Legal**: Checks compliance
+5. **Aggregator**: Combines all results
+
+**Conditional Routing Pattern (Smart Decisions):**
+1. **Classifier**: Detects spam vs. normal tasks
+2. **SpamHandler**: Quarantines spam tasks
+3. **NormalProcessor**: Processes legitimate tasks
+
 ## Prerequisites
 
 - Python 3.8 or higher
 - Azure OpenAI resource with a deployed model
 - Azure OpenAI API key
 - Microsoft Agent Framework package
+- GraphViz system binaries (for PNG export in workflow visualization)
 
 ## Setup Instructions
 
@@ -80,7 +103,15 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+**For Workflow Visualization PNG Export (Optional):**
+Install GraphViz system binaries:
+- **macOS**: `brew install graphviz`
+- **Ubuntu/Debian**: `sudo apt-get install graphviz`
+- **Windows**: Download from https://graphviz.org/download/
+
 ### Step 4: Configure Environment Variables
+
+**Note:** Environment variables are only required for demos that use Azure OpenAI (main.py, morning_routine_workflow.py, travel_assistant_shared_state.py, simple_checkpoint.py). The workflow visualization demo (simple_workflow_viz.py) runs without Azure credentials.
 
 **Option A: Using .env file (Recommended)**
 Create a `.env` file in the project root:
@@ -121,6 +152,11 @@ python travel_assistant_shared_state.py
 python simple_checkpoint.py
 ```
 
+**Run Workflow Visualization Demo:**
+```bash
+python simple_workflow_viz.py
+```
+
 ## Expected Output
 
 ### Chat History Management Demo (`main.py`)
@@ -155,6 +191,14 @@ The checkpoint demo will show:
 5. **Risk Assessor completes** the pipeline with final risk score
 6. **Cost savings** demonstrated by skipping already-completed work
 
+### Workflow Visualization Demo (`simple_workflow_viz.py`)
+The workflow visualization demo will show:
+1. **Fan-out/Fan-in workflow execution** with 3 parallel agents (Researcher, Marketer, Legal)
+2. **Conditional routing workflow execution** with spam detection and smart routing
+3. **Mermaid diagrams generated** as .md files (fanout_fanin.md, conditional_routing.md)
+4. **PNG diagrams generated** as image files (fanout_fanin.png, conditional_routing.png)
+5. **Clean console output** showing workflow execution steps
+
 ## Key Features Demonstrated
 
 ### Chat History Management
@@ -184,6 +228,14 @@ The checkpoint demo will show:
 - **File-Based Storage**: Checkpoints persisted to disk for cross-session recovery
 - **Workflow Validation**: Ensures workflow graph consistency when resuming
 - **Production-Ready Pattern**: Fault tolerance for long-running or expensive AI pipelines
+
+### Workflow Visualization
+- **Automatic Diagram Generation**: WorkflowViz creates visual representations from workflow definitions
+- **Multiple Export Formats**: Mermaid flowcharts (.md) and PNG graphs (.png)
+- **Fan-out/Fan-in Pattern**: Demonstrates parallel task processing with result aggregation
+- **Conditional Routing**: Shows decision-based workflow routing with lambda conditions
+- **Mock Executors**: No Azure API required - instant execution for learning and testing
+- **Educational Design**: Clean, simple code perfect for understanding workflow patterns
 
 ## Sample Output Examples
 
@@ -319,12 +371,40 @@ RUN 2: Resume from Checkpoint
 ======================================================================
 ```
 
+### Workflow Visualization Demo
+```
+WorkflowViz Demo
+==================================================
+
+1. Fan-out/Fan-in (Parallel Processing)
+✅ fanout_fanin.md
+✅ fanout_fanin.png
+📤 Dispatching: New product idea
+🔬 Research complete
+📊 Marketing analysis done
+⚖️  Legal review passed
+📥 Aggregating results
+Result: Research: Tech feasibility confirmed
+        Marketing: High market demand
+        Legal: Compliant with regulations
+
+2. Conditional Routing (Smart Decisions)
+✅ conditional_routing.md
+✅ conditional_routing.png
+🔍 Classified: NORMAL
+✅ Task processed
+==================================================
+✅ Done! Check the .md and .png files above.
+```
+
 ## Troubleshooting
 
 **Import Error**: Make sure you're in the activated virtual environment
 **API Key Error**: Verify your Azure OpenAI credentials are correct
 **API Version Error**: Ensure you're using a supported API version (2024-10-01-preview or later)
 **Workflow Execution Error**: Check that all required environment variables are set correctly
+**PNG Export Not Working**: Install GraphViz system binaries (`brew install graphviz` on macOS, `sudo apt-get install graphviz` on Ubuntu)
+**GraphViz Not Found**: Verify installation with `dot -V` command
 
 ## Learning Outcomes
 
@@ -336,3 +416,5 @@ This demo suite is perfect for early career developers to learn:
 - **Resource Management**: Efficient use of Azure OpenAI resources across multiple agents
 - **Fault Tolerance**: Checkpoint-based recovery for long-running workflows
 - **Cost Optimization**: Avoiding redundant work through intelligent state management
+- **Workflow Visualization**: Understanding and communicating AI agent workflows through diagrams
+- **Design Patterns**: Fan-out/fan-in for parallel processing, conditional routing for smart decisions
