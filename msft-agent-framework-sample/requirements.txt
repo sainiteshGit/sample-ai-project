@@ -1,6 +1,11 @@
+# Core framework
 agent-framework[azure]
 python-dotenv
 azure-identity
 azure-ai-projects
-psutil 
-azure-identity
+# For PNG/SVG/PDF export in workflow visualization
+# Note: Also requires GraphViz system package
+# macOS: brew install graphviz
+# Ubuntu/Debian: sudo apt-get install graphviz
+# Windows: https://graphviz.org/download/
+graphviz
