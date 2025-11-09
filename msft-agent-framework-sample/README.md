@@ -42,6 +42,12 @@ Demonstrates visual workflow diagrams with WorkflowViz:
 - **No Azure Required**: Mock executors for instant demonstration without API calls
 - **Multiple Export Formats**: Mermaid (.md) for web and PNG for presentations
 
+### 6. Vision Agent (`vision_agent_demo.py`)
+Demonstrates multimodal agents that can analyze and understand images:
+- **Image Analysis from URLs**: Process images directly from web URLs
+- **Local File Processing**: Analyze images stored on your local filesystem
+
+
 ## Workflow Overview
 
 The morning routine workflow consists of 5 stages:
@@ -75,10 +81,11 @@ The workflow visualization demo includes 2 patterns:
 ## Prerequisites
 
 - Python 3.8 or higher
-- Azure OpenAI resource with a deployed model
-- Azure OpenAI API key
+- Azure OpenAI resource with a deployed model (not required for workflow visualization demo)
+- Azure OpenAI API key (not required for workflow visualization demo)
 - Microsoft Agent Framework package
 - GraphViz system binaries (for PNG export in workflow visualization)
+- **For Vision Agent**: Vision-capable Azure OpenAI model (gpt-4o, gpt-4-vision-preview, or gpt-4-turbo)
 
 ## Setup Instructions
 
@@ -157,6 +164,11 @@ python simple_checkpoint.py
 python simple_workflow_viz.py
 ```
 
+**Run Vision Agent Demo:**
+```bash
+python vision_agent_demo.py
+```
+
 ## Expected Output
 
 ### Chat History Management Demo (`main.py`)
@@ -198,6 +210,12 @@ The workflow visualization demo will show:
 3. **Mermaid diagrams generated** as .md files (fanout_fanin.md, conditional_routing.md)
 4. **PNG diagrams generated** as image files (fanout_fanin.png, conditional_routing.png)
 5. **Clean console output** showing workflow execution steps
+6. **No Azure API calls** - instant execution with mock executors
+
+### Vision Agent Demo (`vision_agent_demo.py`)
+The vision agent demo will show:
+1. **Basic image analysis** from public URLs with detailed descriptions
+2. **Local file processing** analyzing images from your filesystem
 
 ## Key Features Demonstrated
 
@@ -236,6 +254,12 @@ The workflow visualization demo will show:
 - **Conditional Routing**: Shows decision-based workflow routing with lambda conditions
 - **Mock Executors**: No Azure API required - instant execution for learning and testing
 - **Educational Design**: Clean, simple code perfect for understanding workflow patterns
+
+### Vision Agent
+- **Multimodal Understanding**: Agents can analyze both text and images in a single request
+- **Flexible Image Input**: Support for URLs (UriContent) and local files (DataContent)
+- **Document Intelligence**: Extract structured data from receipts, invoices, forms, and documents
+
 
 ## Sample Output Examples
 
@@ -397,14 +421,43 @@ Result: Research: Tech feasibility confirmed
 ✅ Done! Check the .md and .png files above.
 ```
 
+### Vision Agent Demo
+```
+Vision Agent Demo
+==================================================
+Using deployment: gpt-4o
+
+1. Analyze Image from URL
+� Describe this scene briefly.
+📋 This scene features a serene natural landscape with a wooden 
+boardwalk winding through lush green grasslands under a bright 
+blue sky. The image conveys a peaceful, natural environment 
+perfect for outdoor activities.
+
+2. Analyze Local Image
+🔍 What is in this image? (fanout_fanin.png)
+📋 This image is a flowchart depicting a process workflow. 
+It shows:
+  - Dispatcher (Start): Green box at the top
+  - Researcher, Marketer, Legal: Three blue boxes in parallel
+  - Aggregator: Blue box at the bottom
+  The diagram illustrates a fan-out/fan-in pattern where tasks 
+  are distributed to multiple processors and then aggregated.
+
+==================================================
+✅ Done!
+```
+
 ## Troubleshooting
 
 **Import Error**: Make sure you're in the activated virtual environment
-**API Key Error**: Verify your Azure OpenAI credentials are correct
+**API Key Error**: Verify your Azure OpenAI credentials are correct (not needed for workflow visualization demo)
 **API Version Error**: Ensure you're using a supported API version (2024-10-01-preview or later)
 **Workflow Execution Error**: Check that all required environment variables are set correctly
 **PNG Export Not Working**: Install GraphViz system binaries (`brew install graphviz` on macOS, `sudo apt-get install graphviz` on Ubuntu)
 **GraphViz Not Found**: Verify installation with `dot -V` command
+**Vision Agent Error**: Ensure you're using a vision-capable model (gpt-4o, gpt-4-vision-preview, or gpt-4-turbo)
+**Image Not Loading**: For local images, verify the file path is correct and the image format is supported (JPEG, PNG, GIF, WebP)
 
 ## Learning Outcomes
 
@@ -418,3 +471,5 @@ This demo suite is perfect for early career developers to learn:
 - **Cost Optimization**: Avoiding redundant work through intelligent state management
 - **Workflow Visualization**: Understanding and communicating AI agent workflows through diagrams
 - **Design Patterns**: Fan-out/fan-in for parallel processing, conditional routing for smart decisions
+- **Multimodal AI**: Working with vision-capable models to process images alongside text
+- **Document Intelligence**: Extracting structured data from visual documents automatically
