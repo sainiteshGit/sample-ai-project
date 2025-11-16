@@ -47,8 +47,12 @@ Demonstrates multimodal agents that can analyze and understand images:
 - **Image Analysis from URLs**: Process images directly from web URLs
 - **Local File Processing**: Analyze images stored on your local filesystem
 
+### 7. Multi-Turn Conversations (`multiturn_conversation_demo.py`)
+Demonstrates conversation context management across multiple dialogue turns:
+- **Thread-Based Memory**: AgentThread automatically maintains conversation history
+- **Context Preservation**: Agents remember previous exchanges and build on them
+- **Shopping Assistant**: Handles follow-up questions about product lists
 
-## Workflow Overview
 
 The morning routine workflow consists of 5 stages:
 
@@ -169,6 +173,12 @@ python simple_workflow_viz.py
 python vision_agent_demo.py
 ```
 
+
+**Run Multi-Turn Conversation Demo:**
+```bash
+python multiturn_conversation_demo.py
+```
+
 ## Expected Output
 
 ### Chat History Management Demo (`main.py`)
@@ -216,6 +226,18 @@ The workflow visualization demo will show:
 The vision agent demo will show:
 1. **Basic image analysis** from public URLs with detailed descriptions
 2. **Local file processing** analyzing images from your filesystem
+3. **Document inspection** extracting structured data from receipts and forms
+4. **Batch processing** analyzing multiple images in a folder
+5. **Multi-image comparison** identifying similarities and differences
+6. **Real-world scenarios** demonstrating practical vision applications
+
+### Multi-Turn Conversation Demo (`multiturn_conversation_demo.py`)
+The multi-turn conversation demo will show:
+1. **Shopping assistant** remembering product lists across follow-up questions
+2. **Context preservation** agent recalls "the second one" from previous response
+3. **Natural dialogue flow** building on previous exchanges without repetition
+4. **Automatic memory management** using AgentThread for conversation state
+5. **Real-world conversation patterns** demonstrating human-like interactions
 
 ## Key Features Demonstrated
 
@@ -446,6 +468,62 @@ It shows:
 
 ==================================================
 ✅ Done!
+```
+
+### Multi-Turn Conversation Demo
+```
+Multi-Turn Conversation Demo
+==================================================
+Using deployment: gpt-4o
+
+DEMO 1: Shopping Assistant with Multi-Turn Memory
+--------------------------------------------------
+
+👤 User: Show me laptops under $1000
+
+🤖 Agent: Here are some great laptops under $1000:
+
+1. Acer Aspire 5 - $549
+   - Intel Core i5, 8GB RAM, 256GB SSD, 15.6" FHD
+
+2. HP Pavilion 15 - $850
+   - Intel Core i7, 16GB RAM, 512GB SSD, 15.6" FHD
+
+3. Lenovo IdeaPad 3 - $699
+   - AMD Ryzen 7, 12GB RAM, 512GB SSD, 15.6" FHD
+
+4. Dell Inspiron 15 - $799
+   - Intel Core i5, 16GB RAM, 512GB SSD, 15.6" FHD
+
+5. ASUS VivoBook 15 - $649
+   - Intel Core i5, 8GB RAM, 512GB SSD, 15.6" FHD
+
+Would you like more details about any of these?
+
+👤 User: What about the second one?
+
+🤖 Agent: The HP Pavilion 15 ($850) is an excellent choice! Here are the details:
+
+**Specifications:**
+- Processor: Intel Core i7 (11th Gen)
+- Memory: 16GB DDR4 RAM
+- Storage: 512GB NVMe SSD
+- Display: 15.6" Full HD (1920x1080)
+- Graphics: Intel Iris Xe Graphics
+- Battery: Up to 8 hours
+
+**Key Features:**
+- Great for multitasking with 16GB RAM
+- Fast storage with NVMe SSD
+- Full HD display for clear visuals
+- Modern design with backlit keyboard
+
+This laptop offers excellent value at $850 with strong specs 
+for productivity, light gaming, and multimedia work.
+
+✅ Agent remembered the laptop list from the first question!
+
+==================================================
 ```
 
 ## Troubleshooting
