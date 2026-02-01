@@ -1,0 +1,13 @@
+{
+  "AzureOpenAI": {
+    "Endpoint": "https://your-openai-resource.openai.azure.com",
+    "ApiKey": "your-api-key-here",
+    "DeploymentName": "gpt-4.1-mini"
+  },
+  "CosmosDb": {
+    "ConnectionString": "your-cosmos-connection-string",
+    "Endpoint": "",
+    "DatabaseName": "AgentChatHistory",
+    "ContainerName": "ChatMessages"
+  }
+}

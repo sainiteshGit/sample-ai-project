@@ -1,0 +1,19 @@
+# Build outputs
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+
+# User secrets and local settings
+appsettings.Development.json
+appsettings.Local.json
+*.user
+
+# IDE
+.vs/
+.vscode/
+*.swp
+
+# macOS
+.DS_Store
