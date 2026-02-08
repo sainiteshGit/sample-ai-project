@@ -9,5 +9,12 @@
     "Endpoint": "",
     "DatabaseName": "AgentChatHistory",
     "ContainerName": "ChatMessages"
+  },
+  "ApplicationInsights": {
+    "ConnectionString": "InstrumentationKey=your-key;IngestionEndpoint=https://your-region.in.applicationinsights.azure.com/"
+  },
+  "OpenTelemetry": {
+    "OtlpEndpoint": "http://localhost:4317",
+    "EnableSensitiveData": true
   }
 }
