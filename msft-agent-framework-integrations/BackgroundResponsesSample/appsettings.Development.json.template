@@ -1,0 +1,6 @@
+{
+  "AzureOpenAI": {
+    "Endpoint": "https://<your-resource>.openai.azure.com/",
+    "DeploymentName": "gpt-4.1-mini"
+  }
+}
