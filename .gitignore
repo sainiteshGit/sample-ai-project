@@ -1,4 +1,37 @@
-./semantickernel-agent/SemanticKernelSampleApp/bin/*
-./semantickernel-agent/SemanticKernelSampleApp/bin
+# ─── OS artefacts ───────────────────────────
 .DS_Store
-./*.dll
+Thumbs.db
+
+# ─── Python ─────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# ─── Environment / secrets ──────────────────
+.env
+!.env.example
+
+# ─── .NET build outputs ─────────────────────
+bin/
+obj/
+*.dll
+*.pdb
+*.exe
+*.user
+
+# ─── IDE ────────────────────────────────────
+.vs/
+.idea/
+*.swp
+*.swo
+
+# ─── Misc ───────────────────────────────────
+*.log
+node_modules/

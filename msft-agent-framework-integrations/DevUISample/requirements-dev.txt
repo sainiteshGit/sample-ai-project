@@ -1,0 +1,14 @@
+# ─────────────────────────────────────────────
+# Dev / test dependencies  (not installed in production)
+# ─────────────────────────────────────────────
+
+# Include runtime deps
+-r requirements.txt
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.24
+pytest-mock>=3.14
+
+# Linting / formatting
+ruff>=0.4

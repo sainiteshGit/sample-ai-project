@@ -1,0 +1,22 @@
+# ─── Virtual environment ────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+
+# ─── Environment / secrets ──────────────────
+.env
+agents/.env
+agents/weather_agent/.env
+agents/assistant_agent/.env
+
+# ─── Pytest cache ───────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ─── Ruff cache ─────────────────────────────
+.ruff_cache/
+
+# ─── OS artefacts ───────────────────────────
+.DS_Store
+Thumbs.db

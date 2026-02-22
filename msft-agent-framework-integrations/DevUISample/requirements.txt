@@ -1,0 +1,17 @@
+# ─────────────────────────────────────────────
+# Runtime dependencies
+# https://learn.microsoft.com/en-us/agent-framework/devui/?pivots=programming-language-python
+# ─────────────────────────────────────────────
+
+# Agent Framework DevUI (pre-release — requires Python >=3.10)
+--pre
+agent-framework-devui
+
+# Agent Framework core with Azure extras
+agent-framework[azure]
+
+# OpenAI SDK — used by DevUI's OpenAI-compatible client demo (main.py)
+openai
+
+# Environment variable loading
+python-dotenv
