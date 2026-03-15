@@ -35,3 +35,5 @@ obj/
 # ─── Misc ───────────────────────────────────
 *.log
 node_modules/
+# ─── Secrets ─────────────────────────────────
+appsettings.Development.json
