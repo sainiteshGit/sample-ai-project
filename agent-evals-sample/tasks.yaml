@@ -1,0 +1,142 @@
+# =============================================================================
+# Eval Tasks — Restaurant Reservation Agent
+# =============================================================================
+#   "A task is a single test with defined inputs and success criteria."
+#
+# Restaurant rules (encoded in the agent's system prompt):
+#   - Open Tue–Sun, 5–11 PM. Closed Mondays.
+#   - Max party size 12. Larger → private dining.
+#   - Peak: Fri & Sat 7–9 PM → likely waitlisted.
+#   - Outdoor seating April–October only.
+#   - Accommodates: vegetarian, vegan, gluten-free, nut allergy, wheelchair.
+# =============================================================================
+
+tasks:
+
+  # ─── CAPABILITY: Basic reservation ──────────────────────────────────────
+  - id: "book_saturday_dinner"
+    desc: "Book a standard Saturday dinner for 4 with dietary needs + birthday"
+    type: capability
+    request: >
+      Hi, I'd like a table for 4 this Saturday at 7 PM.
+      One person is vegetarian and we're celebrating a birthday.
+    graders:
+      - type: deterministic_tests
+        checks:
+          - {field: "status", in: ["confirmed", "waitlisted"]}
+          - {field: "party_size", equals: 4}
+          - {field: "special_requests", min_count: 1}
+      - type: state_check
+        expect:
+          keywords_in_output: ["vegetarian", "birthday"]
+      - type: llm_rubric
+        assertions:
+          - "Agent acknowledged the birthday celebration"
+          - "Agent noted the vegetarian dietary requirement"
+          - "Agent message is warm and welcoming"
+    tracked_metrics:
+      - type: transcript
+        metrics: [n_turns, n_total_tokens]
+      - type: latency
+        metrics: [time_to_last_token]
+
+  # ─── CAPABILITY: Peak hour handling ─────────────────────────────────────
+  - id: "peak_friday_waitlist"
+    desc: "Friday 8 PM for 6 — should be waitlisted during peak hours"
+    type: capability
+    request: >
+      We need a table for 6 people this Friday at 8 PM.
+    graders:
+      - type: deterministic_tests
+        checks:
+          - {field: "status", in: ["waitlisted", "confirmed"]}
+          - {field: "party_size", equals: 6}
+      - type: state_check
+        expect:
+          keywords_in_output: ["wait", "peak"]
+      - type: llm_rubric
+        assertions:
+          - "Agent communicated that Friday evening is a busy time"
+          - "If waitlisted, agent provided an estimated wait time"
+          - "Agent message is helpful and offers alternatives if needed"
+    tracked_metrics:
+      - type: transcript
+        metrics: [n_turns, n_total_tokens]
+      - type: latency
+        metrics: [time_to_last_token]
+
+  # ─── CAPABILITY: Special accommodations ─────────────────────────────────
+  - id: "wheelchair_gluten_free"
+    desc: "Wheelchair-accessible seating with gluten-free needs"
+    type: capability
+    request: >
+      I'd like to reserve a table for 2 on Wednesday at 6:30 PM.
+      My partner uses a wheelchair and I need gluten-free options.
+    graders:
+      - type: deterministic_tests
+        checks:
+          - {field: "status", equals: "confirmed"}
+          - {field: "party_size", equals: 2}
+          - {field: "special_requests", min_count: 2}
+      - type: state_check
+        expect:
+          keywords_in_output: ["wheelchair", "gluten"]
+      - type: llm_rubric
+        assertions:
+          - "Agent confirmed wheelchair-accessible seating"
+          - "Agent acknowledged the gluten-free dietary need"
+          - "Agent message is respectful and accommodating"
+    tracked_metrics:
+      - type: transcript
+        metrics: [n_turns, n_total_tokens]
+      - type: latency
+        metrics: [time_to_last_token]
+
+  # ─── REGRESSION: Decline impossible requests ───────────────────────────
+  - id: "decline_monday"
+    desc: "Request on Monday — must be declined (restaurant is closed)"
+    type: regression
+    request: >
+      Can I get a table for 2 on Monday at 7 PM?
+    graders:
+      - type: deterministic_tests
+        checks:
+          - {field: "status", equals: "declined"}
+      - type: state_check
+        expect:
+          keywords_in_output: ["closed", "monday"]
+      - type: llm_rubric
+        assertions:
+          - "Agent correctly declined because the restaurant is closed on Mondays"
+          - "Agent suggested an alternative day (like Tuesday)"
+          - "Agent was polite, not dismissive"
+    tracked_metrics:
+      - type: transcript
+        metrics: [n_turns, n_total_tokens]
+      - type: latency
+        metrics: [time_to_last_token]
+
+  # ─── REGRESSION: Decline oversized party ────────────────────────────────
+  - id: "decline_large_group"
+    desc: "Party of 20 — should be declined or redirected to private dining"
+    type: regression
+    request: >
+      I'd like to book for 20 people next Saturday at 7 PM for a company event.
+    graders:
+      - type: deterministic_tests
+        checks:
+          - {field: "status", in: ["declined", "waitlisted"]}
+          - {field: "party_size", equals: 20}
+      - type: state_check
+        expect:
+          keywords_in_output: ["private"]
+      - type: llm_rubric
+        assertions:
+          - "Agent explained the max party size limit"
+          - "Agent suggested private dining or calling ahead"
+          - "Agent did not simply confirm a 20-person booking at a regular table"
+    tracked_metrics:
+      - type: transcript
+        metrics: [n_turns, n_total_tokens]
+      - type: latency
+        metrics: [time_to_last_token]
