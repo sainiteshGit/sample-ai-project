@@ -1,0 +1,4 @@
+# Core framework (rc5+ for SkillsProvider support)
+agent-framework[azure]>=1.0.0rc5
+python-dotenv
+azure-identity
