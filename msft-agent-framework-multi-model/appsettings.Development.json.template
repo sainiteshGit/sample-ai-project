@@ -1,0 +1,8 @@
+{
+  "AzureOpenAI": {
+    "Endpoint": "https://your-resource.openai.azure.com",
+    "ApiKey": "your-api-key-here",
+    "ModelA": "gpt-4.1-mini",
+    "ModelB": "grok-4-1-fast-reasoning"
+  }
+}
