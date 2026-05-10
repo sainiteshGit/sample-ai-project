@@ -1,0 +1,8 @@
+{
+  "Gateway": {
+    "Endpoint": "https://your-apim-instance.azure-api.net/openai",
+    "ApiKey": "your-apim-subscription-key",
+    "DeploymentName": "gpt-4o-mini",
+    "ApiVersion": "2024-10-21"
+  }
+}
