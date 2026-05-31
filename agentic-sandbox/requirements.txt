@@ -1,0 +1,3 @@
+agent-framework
+python-dotenv
+rich
