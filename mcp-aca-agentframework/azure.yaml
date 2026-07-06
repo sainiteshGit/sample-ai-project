@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: mcp-aca-agentframework
+metadata:
+  template: mcp-aca-agentframework@1.0.0
+
+services:
+  mcp-server:
+    project: ./Server
+    language: dotnet
+    host: containerapp
+    docker:
+      path: Dockerfile
+      context: .
+      remoteBuild: true

@@ -1,0 +1,10 @@
+{
+  "AzureOpenAI": {
+    "Endpoint": "https://<your-aoai-resource>.openai.azure.com/",
+    "ApiKey": "<your-key-or-leave-empty-to-use-DefaultAzureCredential>",
+    "DeploymentName": "gpt-4o-mini"
+  },
+  "Mcp": {
+    "ServerUrl": "http://localhost:8080/mcp"
+  }
+}
