@@ -1,0 +1,8 @@
+{
+  "AzureOpenAI": {
+    "Endpoint": "https://your-resource.openai.azure.com",
+    "Deployment": "gpt-4o-mini",
+    "ApiVersion": "2024-10-21",
+    "ApiKey": "PASTE-YOUR-KEY-HERE"
+  }
+}
