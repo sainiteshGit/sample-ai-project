@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.deepeval/
+.env
+
+# blog content — kept local, never pushed
+BLOG_*.md
+BLOG_*.docx
+~$*.docx
