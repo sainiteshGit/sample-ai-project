@@ -37,7 +37,105 @@ Cases are split by `type`. **Capability** = can it do the thing (book the table)
 a party of 20). Report them separately — a capability gain must never hide a
 safety regression inside one blended average.
 
-## Run it
+## Offline demo: trusting an eval score
+
+[`trust_eval_demo.py`](trust_eval_demo.py) needs only Python 3.9 or newer.
+No packages, API key, or model calls are required. From this directory:
+
+```bash
+python3 trust_eval_demo.py
+```
+
+The four examples cover sampling variation, Wilson confidence intervals,
+simulated version comparisons, and equal averages hiding different failures.
+Outputs explicitly distinguish simulations from constructed example counts;
+they are not measured LLM performance.
+
+For separate screenshots or a different random draw:
+
+```bash
+python3 trust_eval_demo.py --demo variation
+python3 trust_eval_demo.py --demo confidence
+python3 trust_eval_demo.py --demo compare
+python3 trust_eval_demo.py --demo distribution
+python3 trust_eval_demo.py --seed 7
+```
+
+The confidence intervals assume independent trials with a fixed success
+probability. Real evals spanning different cases need an analysis appropriate
+to that sampling design. A simulated version winning more often is not itself
+a statistical significance test.
+
+## Live LLM demo: measuring prompt reliability
+
+[`live_eval_demo.py`](live_eval_demo.py) calls the configured Azure/OpenAI model
+on four fixed reservation requests using two prompt versions. It reuses the
+reservation schema, deterministic grader, environment configuration, and Wilson
+interval helper from the other scripts in this directory. Use the existing
+requirements and configure `.env` as for the judge demos.
+
+```bash
+.venv/bin/python live_eval_demo.py --repeats 5
+```
+
+This makes **40 billable model calls**. Each call creates a fresh conversation.
+Version A uses the existing restaurant prompt; B adds explicit rule-checking
+instructions. The grader checks schema validity, status, and party size, not
+tone or every reservation field. No LLM judge or artificial failures are used.
+The runner uses provider sampling defaults and alternates version order.
+API errors abort the experiment rather than becoming semantic failures.
+
+The final tables show per-case pass rates and Wilson intervals, then the
+fixed-suite averages and paired attempt outcomes. Intervals assume independent
+repeats under stable conditions. No pooled interval or significance claim is
+made across heterogeneous cases. An all-pass run is valid evidence; it does
+not establish perfection or an improvement from the new prompt.
+
+For more repetitions of just the Monday case (40 calls):
+
+```bash
+.venv/bin/python live_eval_demo.py --case monday --repeats 20
+```
+
+Responses, prompts, grader outcomes, timing, model identifiers, and usage are
+saved in gitignored `.eval-results/live-<timestamp>.jsonl` files. Treat these
+files as local experiment artifacts, not production traffic logs.
+
+## Live fault-injection lab
+
+[`fault_injection_demo.py`](fault_injection_demo.py) uses the existing `.env`
+and client configuration. A real model chooses workflow actions; the availability
+tool and booking database are local fakes. No real reservations are created.
+
+```bash
+.venv/bin/python fault_injection_demo.py
+```
+
+The Monday (closed) and Tuesday (open) fixtures each run in three scenarios:
+normal delivery, a first-result drop, and persistent result drops. Only the
+handoff changes. Each scenario gets a fresh environment and at most one retry.
+The default run costs 6-12 model calls. Use `--repeats 3` for 18-36 calls.
+Scenario order rotates between repetitions.
+
+The trace shows source availability, what the model actually received, proposed
+actions, booking guard decisions, and the final in-memory database. Results are
+saved to gitignored `.eval-results/`. API errors abort with an explicit error;
+invalid model outputs are reported as incomplete scenarios.
+
+Safety means no invalid database booking, completion means a verified booking
+or verified decline, and recovery means completion after an injected drop.
+Stopping safely is not completion. Customer messages are rendered by application
+code, so this is not a test of free-form misleading LLM claims. The guard checks
+an affirmative tool result bound to the exact request. It is not a defense
+against corrupted tool contents, changing availability, or database races.
+
+Deterministic regression checks (no API calls):
+
+```bash
+.venv/bin/python -m unittest test_fault_injection_demo.py
+```
+
+## Run the framework examples
 
 ```bash
 pip install -r requirements.txt
