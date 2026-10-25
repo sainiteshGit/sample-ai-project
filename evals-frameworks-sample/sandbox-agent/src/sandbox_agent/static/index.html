@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sandbox-agent</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>sandbox-agent</h1>
+  <span class="muted">Every run gets its own Azure Container Apps sandbox, deleted when the run ends.</span>
+</header>
+<main>
+  <aside>
+    <h2>Agents</h2>
+    <ul id="agents" class="list"></ul>
+
+    <h3>New agent</h3>
+    <form id="newAgent" class="card">
+      <label>Name
+        <input name="name" required pattern="[a-z][a-z0-9_\-]{1,39}" placeholder="e.g. log-triager">
+      </label>
+      <label>Instructions
+        <textarea name="instructions" rows="4" required placeholder="What this agent does and how it should answer"></textarea>
+      </label>
+      <fieldset id="toolBoxes"><legend>Tools</legend></fieldset>
+      <label>Max steps
+        <input name="max_steps" type="number" min="1" max="30" value="10">
+      </label>
+      <label>Run mode
+        <select name="run_mode">
+          <option value="auto">Auto: tools run without asking</option>
+          <option value="review">Review: approve each tool call</option>
+        </select>
+      </label>
+      <button type="submit">Create agent</button>
+      <p id="newAgentErr" class="err"></p>
+    </form>
+  </aside>
+
+  <section id="detail">
+    <p class="muted">Select an agent, or create one on the left.</p>
+  </section>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>
