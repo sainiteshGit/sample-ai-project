@@ -1,0 +1,28 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; color: #1d1d1f; background: #f6f7f9; }
+header { padding: 14px 24px; background: #fff; border-bottom: 1px solid #e3e5e8; display: flex; gap: 16px; align-items: baseline; }
+header h1 { margin: 0; font-size: 20px; }
+main { display: grid; grid-template-columns: 340px 1fr; gap: 20px; padding: 20px; }
+aside, section { min-width: 0; }
+h2 { font-size: 18px; margin: 4px 0 10px; }
+h3 { font-size: 15px; margin: 18px 0 8px; }
+.muted { color: #6b6f76; font-size: 13px; }
+.err { color: #b00020; font-size: 13px; }
+.card { background: #fff; border: 1px solid #e3e5e8; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+label { display: block; font-size: 13px; margin-bottom: 10px; }
+label.inline { display: flex; gap: 4px; align-items: baseline; margin: 4px 0; }
+input, textarea, select { width: 100%; padding: 6px 8px; margin-top: 4px; font: inherit; border: 1px solid #c9ccd1; border-radius: 6px; }
+label.inline input { width: auto; margin: 0; }
+fieldset { border: 1px solid #e3e5e8; border-radius: 6px; margin: 0 0 10px; font-size: 13px; }
+button { padding: 6px 14px; border: 0; border-radius: 6px; background: #0b57d0; color: #fff; cursor: pointer; font: inherit; }
+button.deny { background: #b00020; }
+.list { list-style: none; padding: 0; margin: 0 0 10px; }
+.list li { background: #fff; border: 1px solid #e3e5e8; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; cursor: pointer; font-size: 14px; }
+.list li.active { border-color: #0b57d0; }
+.list li:hover { background: #f0f4ff; }
+.tag { display: inline-block; margin-left: 8px; padding: 1px 6px; border-radius: 4px; background: #eef0f3; font-size: 11px; color: #4a4f57; }
+.trace { background: #fff; border: 1px solid #e3e5e8; border-radius: 8px; padding: 12px 12px 12px 32px; font-family: ui-monospace, monospace; font-size: 13px; white-space: pre-wrap; word-break: break-word; }
+.trace li { margin-bottom: 6px; }
+.trace li.final { font-family: system-ui, sans-serif; font-size: 14px; }
+.approval { background: #fff7e0; border: 1px solid #f0c24b; border-radius: 8px; padding: 12px; margin: 10px 0; font-family: ui-monospace, monospace; font-size: 13px; word-break: break-word; }
+.approval button { margin-top: 8px; }
