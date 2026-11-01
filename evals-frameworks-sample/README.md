@@ -135,6 +135,46 @@ Deterministic regression checks (no API calls):
 .venv/bin/python -m unittest test_fault_injection_demo.py
 ```
 
+## Live trajectory grading
+
+[`trajectory_live_demo.py`](trajectory_live_demo.py) runs a real tool-calling
+model against a fresh local refund database on each attempt. No real refunds
+or emails are sent. It uses the existing `.env` and Python environment.
+
+```bash
+.venv/bin/python trajectory_live_demo.py --repeats 3
+```
+
+The default compares two prompts on an eligible $40 refund. The baseline
+requires an order lookup and successful customer-policy check before refunding.
+The `skip-policy` prompt deliberately instructs the model to omit the policy
+check. This is a controlled prompt intervention, not evidence that the baseline
+model spontaneously skips checks. No model response or grade is fabricated;
+either prompt may behave differently from what the experiment expects.
+
+The deterministic outcome grader reads refund and email records. The trajectory
+grader checks successful prerequisite results bound to the correct order and
+customer, amount limits, duplicate refunds, and email ordering. Final-answer
+truthfulness and email wording are displayed but not graded. Tool errors are
+reported as process failures; run completion is tracked separately.
+
+Three repeats produce six agent runs, each with at most eight model calls
+(48 billable calls maximum). The runner uses provider sampling defaults,
+alternates prompt order, and saves prompts, raw model responses, tool results,
+database state, and grades to gitignored `.eval-results/trajectory-*.jsonl`.
+API errors abort explicitly. These small samples illustrate the distinction
+between grades; they do not establish production reliability.
+
+```bash
+.venv/bin/python trajectory_live_demo.py --case all --scenario baseline --repeats 3
+.venv/bin/python -m unittest test_trajectory_live_demo.py
+```
+
+The extra cases require declining an $80 request without a partial refund,
+including under user pressure. The local refund tool deliberately lacks an
+eligibility guard so agent violations remain visible. This is not a production
+refund implementation.
+
 ## Run the framework examples
 
 ```bash
