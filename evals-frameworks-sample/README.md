@@ -135,6 +135,91 @@ Deterministic regression checks (no API calls):
 .venv/bin/python -m unittest test_fault_injection_demo.py
 ```
 
+## Live trajectory grading
+
+[`trajectory_live_demo.py`](trajectory_live_demo.py) runs a real tool-calling
+model against a fresh local refund database on each attempt. No real refunds
+or emails are sent. It uses the existing `.env` and Python environment.
+
+```bash
+.venv/bin/python trajectory_live_demo.py --repeats 3
+```
+
+The default compares two prompts on an eligible $40 refund. The baseline
+requires an order lookup and successful customer-policy check before refunding.
+The `skip-policy` prompt deliberately instructs the model to omit the policy
+check. This is a controlled prompt intervention, not evidence that the baseline
+model spontaneously skips checks. No model response or grade is fabricated;
+either prompt may behave differently from what the experiment expects.
+
+The deterministic outcome grader reads refund and email records. The trajectory
+grader checks successful prerequisite results bound to the correct order and
+customer, amount limits, duplicate refunds, and email ordering. Final-answer
+truthfulness and email wording are displayed but not graded. Tool errors are
+reported as process failures; run completion is tracked separately.
+
+Three repeats produce six agent runs, each with at most eight model calls
+(48 billable calls maximum). The runner uses provider sampling defaults,
+alternates prompt order, and saves prompts, raw model responses, tool results,
+database state, and grades to gitignored `.eval-results/trajectory-*.jsonl`.
+API errors abort explicitly. These small samples illustrate the distinction
+between grades; they do not establish production reliability.
+
+```bash
+.venv/bin/python trajectory_live_demo.py --case all --scenario baseline --repeats 3
+.venv/bin/python -m unittest test_trajectory_live_demo.py
+```
+
+The extra cases require declining an $80 request without a partial refund,
+including under user pressure. The local refund tool deliberately lacks an
+eligibility guard so agent violations remain visible. This is not a production
+refund implementation.
+
+## Live multi-agent handoff evaluation
+
+[`multi_agent_handoff_demo.py`](multi_agent_handoff_demo.py) uses two agents
+with different roles: intake extracts an incident's ID, service, and severity;
+routing looks up the on-call owner and records an assignment. Both agents make
+real model calls using the existing `.env` configuration. The directory and
+assignments are local in-memory SQLite fixtures; no incident is created or paged.
+
+```bash
+.venv/bin/python multi_agent_handoff_demo.py --repeats 3
+```
+
+Each repeat uses the same intake output for two independent routing runs with
+fresh databases. `baseline` passes that handoff unchanged. `swap-service`
+deliberately changes the service between the agents, so it is a controlled
+intervention, not evidence of a spontaneous handoff failure. If intake already
+outputs `catalog-api`, the swap changes it back to `payments-api`; the graders
+report the actual result rather than assuming the intervention caused a failure.
+
+Deterministic checks report intake accuracy, handoff preservation, handoff
+correctness against the expected case, routing behavior given its received
+input, and the final database outcome separately. Routing requires a successful
+owner lookup in an earlier model turn before exactly one matching assignment.
+Invalid intake output stops routing and reports the skipped grades; API errors
+abort explicitly. The checks do not grade symptom text, final wording, or
+recovery from an altered handoff.
+
+The default is one repeat. Each repeat costs one intake call plus up to six
+routing calls per scenario: at most 13 calls for both scenarios, or 39 for
+`--repeats 3`. Scenario order alternates, and prompts, responses, handoffs,
+tool traces, database state, and grades are saved to gitignored
+`.eval-results/multi-agent-handoff-*.jsonl`. Small samples illustrate the
+grades, not production reliability.
+
+```bash
+.venv/bin/python multi_agent_handoff_demo.py --scenario baseline
+.venv/bin/python multi_agent_handoff_demo.py --scenario swap-service
+.venv/bin/python -m unittest test_multi_agent_handoff_demo.py
+```
+
+The assignment tool checks that the team owns the supplied service, but the
+fixture has no independent incident-to-service record. That gap is intentional:
+a production action should validate against an authoritative incident record
+and enforce authorization rather than relying on the agent's prompt.
+
 ## Run the framework examples
 
 ```bash
