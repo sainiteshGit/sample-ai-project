@@ -1,0 +1,7 @@
+{
+  "AzureOpenAI": {
+    "Endpoint": "https://YOUR-RESOURCE.services.ai.azure.com/openai/v1/",
+    "DeploymentName": "YOUR-DEPLOYMENT",
+    "ApiKey": ""
+  }
+}

@@ -12,6 +12,9 @@ This repository contains a collection of advanced C#/.NET sample applications an
   - SSE (Server-Sent Events) sample for MCP
   - Microsoft Graph integration
   - SSE transport tool and API project
+- **msft-agent-framework-harness/**
+  - C# harness example with a model/tool loop and human approval
+  - Live Azure AI Foundry Responses API example
 - **semantickernel-agent/**
   - Multiple sample apps for Semantic Kernel agent orchestration and plugin integration
   - Includes:
